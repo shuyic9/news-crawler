@@ -1,45 +1,24 @@
-# Scrapy settings for summerproject project
-#
-# For simplicity, this file contains only settings considered important or
-# commonly used. You can find more settings consulting the documentation:
-#
-#     https://docs.scrapy.org/en/latest/topics/settings.html
-#     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
-#     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-
 BOT_NAME = "summerproject"
 
 SPIDER_MODULES = ["summerproject.spiders"]
 NEWSPIDER_MODULE = "summerproject.spiders"
 
 
+# settings.py
+DOWNLOAD_HANDLERS = {
+    "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+    "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+}
+
+# settings.py
+TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
+
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = "summerproject (+http://www.yourdomain.com)"
+#USER_AGENT = "bbcnews (+http://www.yourdomain.com)"
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
-
-# settings.py
-
-# Splash Server Endpoint
-SPLASH_URL = 'http://localhost:8050'
-
-
-# Enable Splash downloader middleware and change HttpCompressionMiddleware priority
-DOWNLOADER_MIDDLEWARES = {
-    'scrapy_splash.SplashCookiesMiddleware': 723,
-    'scrapy_splash.SplashMiddleware': 725,
-    'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
-}
-
-# Enable Splash Deduplicate Args Filter
-SPIDER_MIDDLEWARES = {
-    'scrapy_splash.SplashDeduplicateArgsMiddleware': 100,
-}
-
-# Define the Splash DupeFilter
-DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
-
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -67,13 +46,13 @@ DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    "summerproject.middlewares.SummerprojectSpiderMiddleware": 543,
+#    "bbcnews.middlewares.BbcnewsSpiderMiddleware": 543,
 #}
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
-#    "summerproject.middlewares.SummerprojectDownloaderMiddleware": 543,
+#    "bbcnews.middlewares.BbcnewsDownloaderMiddleware": 543,
 #}
 
 # Enable or disable extensions
@@ -85,7 +64,7 @@ DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 #ITEM_PIPELINES = {
-#    "summerproject.pipelines.SummerprojectPipeline": 300,
+#    "bbcnews.pipelines.BbcnewsPipeline": 300,
 #}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
