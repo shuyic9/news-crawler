@@ -15,7 +15,7 @@ class CnnSpider(scrapy.Spider):
         },
         "DUPEFILTER_DEBUG": True,
     }
-    max_articles = 1000
+    max_articles = 100
     article_count = 0
 
     def start_requests(self):
@@ -32,7 +32,7 @@ class CnnSpider(scrapy.Spider):
 
     async def parse(self, response):
         page = response.meta["playwright_page"]
-        cards_locator = page.locator('div[data-editable="cards"]')
+        cards_locator = page.locator("//div[@data-editable='cards']")
 
         while True:
             await cards_locator.wait_for()
@@ -40,7 +40,7 @@ class CnnSpider(scrapy.Spider):
             article_links = [
                 await e.get_attribute("data-open-link")
                 for e in await cards_locator.locator(
-                    'div[data-component-name="card"]'
+                    "//div[@data-component-name='card']"
                 ).all()
             ]
 
@@ -81,8 +81,8 @@ class CnnSpider(scrapy.Spider):
         title = response.css("h1#maincontent::text").get().strip()
         content = " ".join(
             p.strip()
-            for p in response.css(
-                'p.paragraph[data-component-name="paragraph"]::text'
+            for p in response.xpath(
+                "//p[@data-component-name='paragraph']//text()"
             ).getall()
         )
 
@@ -96,7 +96,7 @@ class CnnSpider(scrapy.Spider):
 
         yield {
             "title": title,
-            "url": response.url,
             "content": content,
-            "published_date": published_date,
+            "url": response.url,
+            "publish_date": published_date,
         }
