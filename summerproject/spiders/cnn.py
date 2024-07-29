@@ -7,7 +7,7 @@ import playwright
 class CnnSpider(scrapy.Spider):
     name = "cnn"
     start_urls = [
-        "https://www.cnn.com/search?q=palestine+hamas+gaza&types=article",
+        'https://www.cnn.com/search?q=israel+gaza+hamas+palestine+"west+bank"=&types=article',
     ]
     custom_settings = {
         "PLAYWRIGHT_LAUNCH_OPTIONS": {
@@ -80,10 +80,8 @@ class CnnSpider(scrapy.Spider):
 
         title = response.css("h1#maincontent::text").get().strip()
         content = " ".join(
-            p.strip()
-            for p in response.xpath(
-                "//p[@data-component-name='paragraph']//text()"
-            ).getall()
+            "".join(p.xpath(".//text()").getall()).strip()
+            for p in response.xpath("//p[@data-component-name='paragraph']")
         )
 
         logging.info(f"Found relevant article: {title}")
@@ -99,4 +97,5 @@ class CnnSpider(scrapy.Spider):
             "content": content,
             "url": response.url,
             "publish_date": published_date,
+            "word_count": len(content.split()),
         }
