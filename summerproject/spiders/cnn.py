@@ -15,7 +15,7 @@ class CnnSpider(scrapy.Spider):
         },
         "DUPEFILTER_DEBUG": True,
     }
-    max_articles = 100
+    max_articles = 50
     article_count = 0
 
     def start_requests(self):
@@ -91,11 +91,14 @@ class CnnSpider(scrapy.Spider):
             "/html/head/script[contains(.,'window.CNN = ')]"
         ).get()
         published_date = re.search("published_date: '(.*)',", script_block).group(1)
+        # TODO: A lot of articles seem to have an empty author field, may need to extract from page content
+        author = re.search("author: '(.*)',", script_block).group(1)
 
         yield {
             "title": title,
             "content": content,
-            "url": response.url,
             "publish_date": published_date,
+            "url": response.url,
+            "author": author,
             "word_count": len(content.split()),
         }

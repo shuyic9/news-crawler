@@ -106,12 +106,13 @@ class AbcSpider(scrapy.Spider):
         page_data = JSONDecoder().raw_decode(
             script_block.partition(data_identifier)[2]
         )[0]
-        page_metadata = page_data["page"]["content"]["story"]["story"]["metadata"]
+        story_data = page_data["page"]["content"]["story"]["story"]
 
         yield {
             "title": title,
             "content": content,
+            "publish_date": story_data["publishedDate"],
             "url": response.url,
-            "publish_date": page_metadata["timestamp"],
-            "word_count": len(content.split()),
+            "author": story_data["authorsStr"].strip().replace(", ", ","),
+            "word_count": story_data["wordCount"],
         }
