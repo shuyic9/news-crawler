@@ -10,6 +10,7 @@ class AljazeeraSpider(scrapy.Spider):
         "PLAYWRIGHT_LAUNCH_OPTIONS": {
             "headless": True,
         },
+        "PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT": 10 * 60 * 1000, # 10 minutes
         "DUPEFILTER_DEBUG": True,
     }
     pages = 10
@@ -60,7 +61,7 @@ class AljazeeraSpider(scrapy.Spider):
 
     def parse_article(self, response):
         logging.info(f"Scraping article: {response.url}")
-        title = response.xpath("//header//h1/text()").get().strip()
+        title = response.xpath("//main//h1/text()").get().strip()
         content = " ".join(
             "".join(e for e in p.xpath(".//text()").getall() if not e.isspace()).strip()
             for p in response.xpath("//main[@id='main-content-area']//p")
@@ -79,11 +80,16 @@ class AljazeeraSpider(scrapy.Spider):
             if r["@type"] == "NewsArticle"
         )
 
+        author_data = react_root["author"]
+        if not isinstance(author_data, list):
+            author_data = [author_data]
+        authors = ",".join(x["name"] for x in author_data)
+
         yield {
             "title": title,
             "content": content,
             "publish_date": react_root["datePublished"],
             "url": response.url,
-            "author": react_root["author"]["name"],
+            "author": authors,
             "word_count": len(content.split()),
         }
