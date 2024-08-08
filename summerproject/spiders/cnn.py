@@ -90,9 +90,10 @@ class CnnSpider(scrapy.Spider):
         script_block = response.xpath(
             "/html/head/script[contains(.,'window.CNN = ')]"
         ).get()
-        published_date = re.search("published_date: '(.*)',", script_block).group(1)
+        published_date = re.search(" published_date: '(.*)',", script_block).group(1)
         # TODO: A lot of articles seem to have an empty author field, may need to extract from page content
-        author = re.search("author: '(.*)',", script_block).group(1)
+        author = re.search(" author: '(.*)',", script_block).group(1)
+        affiliation = re.search(" section: '(.*)',", script_block).group(1)
 
         yield {
             "title": title,
@@ -101,4 +102,5 @@ class CnnSpider(scrapy.Spider):
             "url": response.url,
             "author": author,
             "word_count": len(content.split()),
+            "affiliation": affiliation,
         }
