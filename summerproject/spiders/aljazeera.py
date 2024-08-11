@@ -1,6 +1,8 @@
 import scrapy
 import logging
+import itertools
 import json
+import playwright
 
 
 class AljazeeraSpider(scrapy.Spider):
@@ -10,10 +12,10 @@ class AljazeeraSpider(scrapy.Spider):
         "PLAYWRIGHT_LAUNCH_OPTIONS": {
             "headless": True,
         },
-        "PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT": 10 * 60 * 1000, # 10 minutes
+        "PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT": 10 * 60 * 1000,  # 10 minutes
         "DUPEFILTER_DEBUG": True,
     }
-    pages = 10
+    pages = None
 
     def start_requests(self):
         for url in self.start_urls:
@@ -30,9 +32,16 @@ class AljazeeraSpider(scrapy.Spider):
         page = response.meta["playwright_page"]
         await page.wait_for_timeout(5000)
 
-        for i in range(1, self.pages):
-            await page.get_by_test_id("show-more-button").click()
-            await page.wait_for_timeout(3000)
+        for i in range(1, self.pages) if self.pages is not None else itertools.count():
+            try:
+                await page.get_by_test_id("show-more-button").click()
+                await page.wait_for_timeout(3000)
+                if await page.get_by_text("6 Oct 2023").count() > 0:
+                    logging.info("Found final article")
+                    break
+            except playwright.async_api.TimeoutError:
+                logging.info("Reached final page")
+                break
 
         article_links = [
             await e.get_attribute("href")
