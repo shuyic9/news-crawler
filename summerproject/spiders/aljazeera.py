@@ -46,7 +46,7 @@ class AljazeeraSpider(scrapy.Spider):
         article_links = [
             await e.get_attribute("href")
             for e in await page.locator(
-                "//a[starts-with(@href,'/news/') or starts-with(@href,'/features/')]"
+                "//a[starts-with(@href,'/news/') or starts-with(@href,'/features/') and not(contains(@href,'/liveblog/))]"
             ).all()
         ]
 
